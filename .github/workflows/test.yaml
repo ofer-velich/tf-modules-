@@ -15,4 +15,9 @@ jobs:
         uses: tj-actions/changed-files@v38
         with:
           dir_names: "true"
+      - name: List all changed dir
+        run: |
+          for file in ${{ steps.changed-files-dir-names.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
 
