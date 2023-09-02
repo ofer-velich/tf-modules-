@@ -17,9 +17,6 @@ jobs:
         uses: tj-actions/changed-files@v38
         with:
           dir_names: "true"
-          files_yaml: |
-            modules:
-              - modules/**
               
       - name: List all changed dir
         run: |
