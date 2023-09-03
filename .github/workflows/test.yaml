@@ -17,10 +17,10 @@ jobs:
         id: changed-files-dir-names
         uses: tj-actions/changed-files@v38
         with:
-          dir_names: "true"
           files_yaml: |
-            modules:
-              - modules/**
+            doc:
+              - '**/*.md'
+              - docs/**
               
       - name: List all changed dir
         run: |
