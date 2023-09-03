@@ -22,27 +22,14 @@ jobs:
         id: changed-files-yaml
         uses: tj-actions/changed-files@v38
         with:
+          dir_names: true
           files_yaml: |
-            doc:
-              - '**/*.md'
-              - docs/**
-              - README.md
-            test:
-              - test/**
-              - '!test/**.md'
             modules:
               - modules/**
-          # Optionally set `files_yaml_from_source_file` to read the YAML from a file. e.g `files_yaml_from_source_file: .github/changed-files.yml`
-
+          
       - name: Run step if modules file(s) change
         # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
         if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'  
         run: |
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
-      
-      - name: Run step if doc file(s) change
-        if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        run: |
-          echo "One or more doc file(s) has changed."
-          echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.doc_all_changed_files }}"
