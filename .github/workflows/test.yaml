@@ -13,7 +13,8 @@ jobs:
         with:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
           files: |
-            modules/**/*
+            doc:
+              - modules/**/*
           
       - name: Run changed-files with dir_names
         id: changed-files-dir-names
