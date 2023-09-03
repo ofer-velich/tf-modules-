@@ -33,3 +33,11 @@ jobs:
         run: |
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
+
+      - name: Render terraform docs inside the README.md and push changes back to PR branch
+        uses: terraform-docs/gh-actions@v1.0.0
+        with:
+          working-dir: steps.changed-files-yaml.outputs.modules_all_changed_files
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
