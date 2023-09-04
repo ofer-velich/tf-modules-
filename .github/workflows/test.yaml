@@ -25,11 +25,10 @@ jobs:
         uses: tj-actions/changed-files@v38
         with:
           separator: ","
-          dir_names: true
           files_yaml: |
             modules:
               - modules/**
-          files_ignore: "**/test"
+          files_ignore: "**/test/**/*"
           
       - name: Print if modules file(s) change
         id: print-changed-files-output
