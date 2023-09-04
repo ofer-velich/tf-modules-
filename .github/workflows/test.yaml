@@ -29,9 +29,7 @@ jobs:
           files_yaml: |
             modules:
               - modules/**
-          files_ignore_yaml: |
-            test:
-              - modules/**/test/**/*
+          files_ignore: modules/**/test
           
       - name: Print if modules file(s) change
         id: print-changed-files-output
