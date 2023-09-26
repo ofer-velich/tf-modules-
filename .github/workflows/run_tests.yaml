@@ -1,1 +1,37 @@
+name: Run Tests
 
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  changed_files:
+    runs-on: ubuntu-latest
+    name: changed-files
+    outputs:
+      modules: ${{ steps.set-changed-files-output.outputs.modules }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get all modules files that have changed
+        id: changed-files-yaml
+        uses: tj-actions/changed-files@v38
+        with:
+          separator: ","
+          dir_names: true
+          files_yaml: |
+            modules:
+              - modules/**
+              - '!modules/**/*.md'
+
+      - name: Print if modules file(s) change
+        id: print-changed-files-output
+        # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
+        if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+        run: |
+          echo "One or more modules file(s) has changed."
+          echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
