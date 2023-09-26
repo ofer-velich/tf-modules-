@@ -18,7 +18,6 @@ jobs:
         id: changed-files-yaml
         uses: tj-actions/changed-files@v38
         with:
-          separator: ","
           dir_names: true
           files_yaml: |
             modules:
@@ -33,5 +32,9 @@ jobs:
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
 
-
+      - name: Set output if modules file(s) change
+        id: set-changed-files-output
+        # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
+        if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+        run: echo "modules=${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}" >> $GITHUB_OUTPUT
 
