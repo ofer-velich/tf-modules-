@@ -49,7 +49,8 @@ jobs:
           done
           
           # Store the list of changed directories in an output variable
-          echo "::set-output name=test_directories::${test_directories[*]}"
+          echo "test_directories=${test_directories[*]}" >> $GITHUB_OUTPUT
+          echo "test_directories=${test_directories[*]}"
         shell: bash
 
       - name: Identify Changed Test Directories
