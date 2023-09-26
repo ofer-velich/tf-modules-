@@ -41,10 +41,29 @@ jobs:
       - name: Find Test Folders
         id: find-test-folders
         run: |
+          test_directories=()
           for dir in $(echo "${{ steps.set-changed-files-output.outputs.modules }}"); do
             if [ -d "$dir/test" ]; then
-              echo "Test folder found in $dir"
+              test_directories+=("$dir")
             fi
           done
+          
+          # Store the list of changed directories in an output variable
+          echo "::set-output name=test_directories::${test_directories[*]}"
+        shell: bash
+
+      - name: Identify Changed Test Directories
+        id: find-changed-directories
+        run: |
+          changed_directories=()
+          for directory in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '/' | cut -d'/' -f1 | uniq); do
+            if [ -d "$directory/test" ]; then
+              changed_directories+=("$directory")
+            fi
+          done
+
+          # Store the list of changed directories in an output variable
+          echo "::set-output name=changed_directories::${changed_directories[*]}"
+          echo "${changed_directories[*]}"
         shell: bash
 
