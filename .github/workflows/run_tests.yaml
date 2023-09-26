@@ -14,3 +14,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get all modules files that have changed
+        id: changed-files-yaml
+        uses: tj-actions/changed-files@v38
+        with:
+          separator: ","
+          dir_names: true
+          files_yaml: |
+            modules:
+              - modules/**
+              - '!modules/**/*.md'
