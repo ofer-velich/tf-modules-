@@ -38,3 +38,13 @@ jobs:
         if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
         run: echo "modules=${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}" >> $GITHUB_OUTPUT
 
+      - name: Find Test Folders
+        id: find-test-folders
+        run: |
+          for dir in $(echo "${{ steps.set-changed-files-output.outputs.modules }}"); do
+            if [ -d "$dir/test" ]; then
+              echo "Test folder found in $dir"
+            fi
+          done
+        shell: bash
+
