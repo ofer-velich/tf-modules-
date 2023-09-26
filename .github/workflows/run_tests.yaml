@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     name: changed-files
     outputs:
-      modules: ${{ steps.set-changed-files-output.outputs.modules }}
+      test_directories: ${{ steps.find-changed-test-folders.outputs.test_directories }}
 
     steps:
       - uses: actions/checkout@v3
@@ -32,14 +32,9 @@ jobs:
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
 
-      - name: Set output if modules file(s) change
-        id: set-changed-files-output
-        # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
+      - name: Filter Test Folders
+        id: find-changed-test-folders
         if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
-        run: echo "modules=${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}" >> $GITHUB_OUTPUT
-
-      - name: Find Test Folders
-        id: find-test-folders
         run: |
           test_directories=()
           for dir in $(echo "${{ steps.set-changed-files-output.outputs.modules }}"); do
@@ -50,5 +45,31 @@ jobs:
           
           # Store the list of changed directories in an output variable
           echo "test_directories=${test_directories[*]}" >> $GITHUB_OUTPUT
-          echo "test_directories=${test_directories[*]}"
+          echo "List all changed modules with test folder: test_directories=${test_directories[*]}"
         shell: bash
+  
+  run_tests:
+    runs-on: ubuntu-latest
+    needs: changed_files
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Setup terraform
+      if : ${{ needs.changed_files.outputs.modules != '' }}
+      uses: hashicorp/setup-terraform@v2
+      with: 
+        terraform_wrapper: false
+        terraform_version: 1.0.11
+      #   cli_config_credentials_hostname: app.terraform.io 
+      #   cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      # env:
+      #   GITHUB_TOKEN: ${{ secrets.GH_RIN_ACTION_TOKEN }}
+        
+    - name: Setup go
+      if : ${{  needs.changed_files.outputs.modules != '' }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
