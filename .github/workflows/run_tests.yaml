@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     name: changed-files
     outputs:
-      test_directories: ${{ toJson(steps.find-changed-test-folders.outputs.test_directories) }}
+      test_directories: ${{ steps.find-changed-test-folders.outputs.test_directories }}
 
     steps:
       - uses: actions/checkout@v3
@@ -45,7 +45,8 @@ jobs:
           done
           
           # Store the list of changed directories in an output variable
-          echo "test_directories=${test_directories[*]}" >> $GITHUB_OUTPUT
+          DATA=$(echo ${test_directories[*]} | jq -c)
+          echo "test_directories=$DATA" >> "$GITHUB_OUTPUT"
           echo "List all changed modules with test folder: ${test_directories[*]}"
         shell: bash
 
