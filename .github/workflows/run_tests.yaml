@@ -53,18 +53,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: changed_files
 
-    # strategy:
-    #   matrix:
-    #     test: ${{ needs.changed_files.outputs.test_directories }}
+    strategy:
+      matrix:
+        test: ${{fromJson(needs.changed_files.outputs.test_directories)}}
 
     steps:
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
-    - name: Echo
-      run: |
-        echo ${{ needs.changed_files.outputs.test_directories }}
+    # - name: Echo
+    #   run: |
+    #     echo ${{ needs.changed_files.outputs.test_directories }}
         
     - name: Setup terraform
       uses: hashicorp/setup-terraform@v2
