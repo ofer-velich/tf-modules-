@@ -18,6 +18,7 @@ jobs:
         id: changed-files-yaml
         uses: tj-actions/changed-files@v38
         with:
+          separator: ","
           dir_names: true
           files_yaml: |
             modules:
@@ -54,7 +55,7 @@ jobs:
 
     strategy:
       matrix:
-        test: ${{ fromJson(needs.changed_files.outputs.test_directories) }} 
+        test: ${{ needs.changed_files.outputs.test_directories }} 
 
         
     steps:
