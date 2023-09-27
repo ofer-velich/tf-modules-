@@ -38,7 +38,9 @@ jobs:
       run: |
         test_directories="";
         for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
+          echo "dir is $dir"
           if [ -d "$dir/test" ]; then
+            echo "dir has a test folder"
             test_directories="$test_directories\"$dir/test\","
           fi
         done
