@@ -1,0 +1,8 @@
+locals {
+  name = "myname2"
+}
+
+output "name" {
+  value = local.name
+}
+
