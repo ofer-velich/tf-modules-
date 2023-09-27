@@ -36,7 +36,7 @@ jobs:
         id: find-changed-test-folders
         if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
         run: |
-          test_directories=""
+          test_directories=()
           for dir in $(echo "${{ steps.set-changed-files-output.outputs.modules }}"); do
             if [ -d "$dir/test" ]; then
               test_directories+="${$dir}/test"
