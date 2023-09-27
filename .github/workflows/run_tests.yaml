@@ -55,7 +55,7 @@ jobs:
 
     strategy:
       matrix:
-        test: ["A"]
+        test: ${{ needs.changed_files.outputs.test_directories }}
 
     steps:
     - uses: actions/checkout@v3
