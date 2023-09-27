@@ -58,6 +58,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Echo Outputs 
+      if : ${{ needs.changed_files.outputs.test_directories != '' }}
       run: |
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ needs.changed_files.outputs.test_directories }}"
