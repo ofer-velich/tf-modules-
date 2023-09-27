@@ -39,13 +39,13 @@ jobs:
           test_directories=""
           for dir in $(echo "${{ steps.set-changed-files-output.outputs.modules }}"); do
             if [ -d "$dir/test" ]; then
-              test_directories+="${test_directories} ${dir}/test"
+              test_directories+="${$dir}/test"
             fi
           done
           
           # Store the list of changed directories in an output variable
-          echo "test_directories=${test_directories}" >> $GITHUB_OUTPUT
-          echo "List all changed modules with test folder: test_directories=${test_directories}"
+          echo "test_directories=${test_directories[*]}" >> $GITHUB_OUTPUT
+          echo "List all changed modules with test folder: ${test_directories[*]}"
         shell: bash
 
   run_tests:
