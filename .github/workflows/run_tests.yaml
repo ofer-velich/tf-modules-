@@ -84,13 +84,11 @@ jobs:
     - name: Setup go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.23'
+        go-version: '1.14'
 
     - name: Download go modules
       working-directory: ${{ matrix.test }}
-      run: |
-        go mod init "test"
-        go mod tidy
+      run: go mod download
       
     # - name: Run module tests
     #   working-directory: ${{ matrix.test }}
