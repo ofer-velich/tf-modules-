@@ -20,7 +20,6 @@ jobs:
         with:
           separator: ","
           dir_names: true
-          output-format: "json"
           files_yaml: |
             modules:
               - modules/**
@@ -56,7 +55,7 @@ jobs:
 
     strategy:
       matrix:
-        test: ${{ fromJson(needs.changed_files.outputs.test_directories) }}
+        test: ${{ needs.changed_files.outputs.test_directories }}
 
     steps:
     - uses: actions/checkout@v3
