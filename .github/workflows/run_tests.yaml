@@ -44,8 +44,8 @@ jobs:
         done
 
         # Store the list of changed directories in an output variable
-        echo "test_directories=${test_directories[*]}" >> "$GITHUB_OUTPUT"
-        echo "List all changed modules with test folder: ${test_directories[*]}"
+        echo "test_directories=${test_directories}" >> "$GITHUB_OUTPUT"
+        echo "List all changed modules with test folder: ${test_directories}"
       
       shell: bash
 
