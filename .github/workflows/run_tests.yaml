@@ -36,16 +36,17 @@ jobs:
       id: find-changed-test-folders
       if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
       run: |
-           test_directories=()
-           for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
-             if [ -d "$dir/test" ]; then
-               test_directories+="${dir}/test"
-             fi
-           done
+        test_directories="";
+        for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
+          if [ -d "$dir/test" ]; then
+            test_directories="$test_directories\"$dir/test\""
+          fi
+        done
 
-           # Store the list of changed directories in an output variable
-           echo "test_directories=${test_directories[*]}" >> "$GITHUB_OUTPUT"
-           echo "List all changed modules with test folder: ${test_directories[*]}"
+        # Store the list of changed directories in an output variable
+        echo "test_directories=${test_directories[*]}" >> "$GITHUB_OUTPUT"
+        echo "List all changed modules with test folder: ${test_directories[*]}"
+      
       shell: bash
 
   run_tests:
@@ -61,6 +62,10 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
+    - name: Echo
+      run: |
+        echo ${{ needs.changed_files.outputs.test_directories }}
+        
     - name: Setup terraform
       uses: hashicorp/setup-terraform@v2
       with:
