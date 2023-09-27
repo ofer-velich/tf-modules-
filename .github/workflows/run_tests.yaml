@@ -7,8 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     name: changed-files
     outputs:
-      test_directories: ${{ steps.find-changed-test-folders.outputs.test_directories }}
-
+      #test_directories: ${{ steps.find-changed-test-folders.outputs.test_directories }}
+      test_directories: ${{steps.changed-files-yaml.outputs.modules_all_changed_files }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -19,6 +19,7 @@ jobs:
         uses: tj-actions/changed-files@v38
         with:
           dir_names: true
+          output-format: "json"
           files_yaml: |
             modules:
               - modules/**
@@ -32,21 +33,21 @@ jobs:
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
 
-      - name: Filter Test Folders
-        id: find-changed-test-folders
-        if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
-        run: |
-          test_directories=()
-          for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
-            if [ -d "$dir/test" ]; then
-              test_directories+="${dir}/test"
-            fi
-          done
+      # - name: Filter Test Folders
+      #   id: find-changed-test-folders
+      #   if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+      #   run: |
+      #     test_directories=()
+      #     for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
+      #       if [ -d "$dir/test" ]; then
+      #         test_directories+="${dir}/test"
+      #       fi
+      #     done
           
-          # Store the list of changed directories in an output variable
-          echo "test_directories=${test_directories[*]}" >> "$GITHUB_OUTPUT"
-          echo "List all changed modules with test folder: ${test_directories[*]}"
-        shell: bash
+      #     # Store the list of changed directories in an output variable
+      #     echo "test_directories=${test_directories[*]}" >> "$GITHUB_OUTPUT"
+      #     echo "List all changed modules with test folder: ${test_directories[*]}"
+      #   shell: bash
 
   run_tests:
     runs-on: ubuntu-latest
