@@ -88,7 +88,10 @@ jobs:
 
     - name: Download go modules
       working-directory: ${{ matrix.test }}
-      run: go mod download
+      run: |
+        go mod init "test"
+        go mod tidy
+        go mod download
       
     # - name: Run module tests
     #   working-directory: ${{ matrix.test }}
