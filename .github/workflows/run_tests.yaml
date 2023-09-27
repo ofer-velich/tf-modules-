@@ -18,7 +18,6 @@ jobs:
         id: changed-files-yaml
         uses: tj-actions/changed-files@v38
         with:
-          separator: ","
           dir_names: true
           files_yaml: |
             modules:
