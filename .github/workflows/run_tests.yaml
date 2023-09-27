@@ -85,7 +85,9 @@ jobs:
       id: run-tests
       run: |
         for dir in $(echo "${{ needs.changed_files.outputs.test_directories }}"); do
-          echo $dir
+          cd $dir
+          echo pwd
+          cd -
         done
         
       shell: bash
