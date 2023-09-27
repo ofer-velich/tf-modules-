@@ -39,7 +39,7 @@ jobs:
           test_directories=()
           for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
             if [ -d "$dir/test" ]; then
-              test_directories+="${dir}/test"
+              echo "test"
             fi
           done
           
