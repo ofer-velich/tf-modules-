@@ -69,7 +69,7 @@ jobs:
 
     - name: Echo
       run: |
-        echo ${{ matrix }}
+        echo ${{ matrix.test }}
         
     # - name: Setup terraform
     #   uses: hashicorp/setup-terraform@v2
