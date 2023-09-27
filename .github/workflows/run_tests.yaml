@@ -10,32 +10,32 @@ jobs:
       test_directories: ${{ steps.find-changed-test-folders.outputs.test_directories }}
       
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-      - name: Get all modules files that have changed
-        id: changed-files-yaml
-        uses: tj-actions/changed-files@v38
-        with:
-          dir_names: true
-          files_yaml: |
-            modules:
-              - modules/**
-              - '!modules/**/*.md'
+    - name: Get all modules files that have changed
+      id: changed-files-yaml
+      uses: tj-actions/changed-files@v38
+      with:
+        dir_names: true
+        files_yaml: |
+          modules:
+            - modules/**
+            - '!modules/**/*.md'
 
-      - name: Print if modules file(s) change
-        id: print-changed-files-output
-        # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
-        if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
-        run: |
+    - name: Print if modules file(s) change
+      id: print-changed-files-output
+      # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
+      if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+      run: |
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
 
-       - name: Filter Test Folders
-         id: find-changed-test-folders
-         if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
-         run: |
+    - name: Filter Test Folders
+      id: find-changed-test-folders
+      if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+      run: |
            test_directories=()
            for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
              if [ -d "$dir/test" ]; then
@@ -46,4 +46,4 @@ jobs:
            # Store the list of changed directories in an output variable
            echo "test_directories=${test_directories[*]}" >> "$GITHUB_OUTPUT"
            echo "List all changed modules with test folder: ${test_directories[*]}"
-         shell: bash
+      shell: bash
