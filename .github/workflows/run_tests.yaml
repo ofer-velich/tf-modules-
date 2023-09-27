@@ -39,7 +39,7 @@ jobs:
           test_directories=()
           for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
             if [ -d "$dir/test" ]; then
-              echo "test"
+              test_directories+="${dir}/test"
             fi
           done
           
@@ -62,7 +62,23 @@ jobs:
       run: |
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ needs.changed_files.outputs.test_directories }}"
-
+  
+    - name: Setup terraform
+      if : ${{ needs.changed_files.outputs.test_directories != '' }}
+      uses: hashicorp/setup-terraform@v2
+      with: 
+        terraform_wrapper: false
+        terraform_version: 1.0.11
+      #   cli_config_credentials_hostname: app.terraform.io 
+      #   cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      # env:
+      #   GITHUB_TOKEN: ${{ secrets.GH_RIN_ACTION_TOKEN }}
+        
+    - name: Setup go
+      if : ${{  needs.changed_files.outputs.modules != '' }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
   
   # run_tests:
   #   runs-on: ubuntu-latest
@@ -73,20 +89,5 @@ jobs:
   #     with:
   #       ref: ${{ github.event.pull_request.head.ref }}
 
-  #   - name: Setup terraform
-  #     if : ${{ needs.changed_files.outputs.test_directories != '' }}
-  #     uses: hashicorp/setup-terraform@v2
-  #     with: 
-  #       terraform_wrapper: false
-  #       terraform_version: 1.0.11
-  #     #   cli_config_credentials_hostname: app.terraform.io 
-  #     #   cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
-  #     # env:
-  #     #   GITHUB_TOKEN: ${{ secrets.GH_RIN_ACTION_TOKEN }}
-        
-  #   - name: Setup go
-  #     if : ${{  needs.changed_files.outputs.modules != '' }}
-  #     uses: actions/setup-go@v1
-  #     with:
-  #       go-version: 1.13
+  
         
