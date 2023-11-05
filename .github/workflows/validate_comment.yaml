@@ -1,0 +1,23 @@
+name: Comment Validation
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  validate-comments:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check for forbidden words
+      uses: actions/checkout@v2
+      
+    - name: Check Comment
+      run: |
+        forbidden_word="ofer"
+        if [[ $(jq -r .comment.body < "${GITHUB_EVENT_PATH}" | grep -c "$forbidden_word") -gt 0 ]]; then
+          echo "Comment contains forbidden word: $forbidden_word"
+          exit 1
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
