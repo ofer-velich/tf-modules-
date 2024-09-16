@@ -7,28 +7,92 @@ jobs:
     runs-on: ubuntu-latest
     name: changed-files
     outputs:
-      modules: ${{ steps.set-changed-files-output.outputs.modules }}
-
+      test_directories: ${{ steps.find-changed-test-folders.outputs.test_directories }}
+      
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-      - name: Get all modules files that have changed
-        id: changed-files-yaml
-        uses: tj-actions/changed-files@v38
-        with:
-          separator: ","
-          dir_names: true
-          files_yaml: |
-            modules:
-              - modules/**
-              - '!modules/**/*.md'
+    - name: Get all modules files that have changed
+      id: changed-files-yaml
+      uses: tj-actions/changed-files@v38
+      with:
+        dir_names: true
+        files_yaml: |
+          modules:
+            - modules/**
+            - '!modules/**/*.md'
 
-      - name: Print if modules file(s) change
-        id: print-changed-files-output
-        # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
-        if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
-        run: |
+    - name: Print if modules file(s) change
+      id: print-changed-files-output
+      # NOTE: Ensure all outputs are prefixed by the same key used above e.g. `test_(...)` | `doc_(...)` | `modules_(...)` when trying to access the `any_changed` output.
+      if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+      run: |
           echo "One or more modules file(s) has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"
+
+    - name: Filter Test Folders
+      id: find-changed-test-folders
+      if: steps.changed-files-yaml.outputs.modules_any_changed == 'true'
+      run: |
+        test_directories="";
+        for dir in $(echo "${{ steps.changed-files-yaml.outputs.modules_all_changed_files }}"); do
+          echo "dir is $dir"
+          if [ -d "$dir/test" ]; then
+            echo "dir has a test folder"
+            test_directories="$test_directories\"$dir/test\","
+          fi
+        done
+        
+        # Trim the last ','
+        test_directories="${test_directories%,}"
+        # Store the list of changed directories in an output variable
+        echo "test_directories=[${test_directories}]" >> "$GITHUB_OUTPUT"
+        # Echo the output
+        echo "List all changed modules with test folder: [${test_directories}]"
+      
+      shell: bash
+
+  run_tests:
+    runs-on: ubuntu-latest
+    needs: changed_files
+
+    strategy:
+      matrix:
+        test: ${{fromJson(needs.changed_files.outputs.test_directories)}}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Echo
+      run: |
+        echo ${{ matrix.test }}
+        
+    - name: Setup terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_wrapper: false
+        terraform_version: 1.0.11
+      #   cli_config_credentials_hostname: app.terraform.io
+      #   cli_config_credentials_token: ${{ secrets.TERRAFORM_TOKEN }}
+      # env:
+      #   GITHUB_TOKEN: ${{ secrets.GH_RIN_ACTION_TOKEN }}
+
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.19.3'
+
+    - name: Download go modules
+      working-directory: ${{ matrix.test }}
+      run: go mod download
+      
+    - name: Run module tests
+      working-directory: ${{ matrix.test }}
+      run: go test -timeout 30m -v -tags=unit
+      # env:
+      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
